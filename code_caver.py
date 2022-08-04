@@ -3,7 +3,8 @@ import pykd, sys, argparse
 prot_constants = [0x20, 0x40]	# Protection constants to check if the memory region is executable
 running_addr = 0				# Used to skip the current code cave (recursion yay)
 
-def analyze_cave(start_addr) -> int:
+
+def analyze_cave(start_addr):
 	global running_addr
 	flag = True					# Used to find the end of the code cave
 	counter = 0					# Used to move through the memory region
@@ -14,12 +15,11 @@ def analyze_cave(start_addr) -> int:
 			flag = False																	# If it does, the flag will be inverted and the loop ends
 			out = pykd.dbgCommand('dd ({0} + 4 * 0n{1}) L4'.format(start_addr, counter - 1))	# Obtain the end of the code cave
 			running_addr = int(out.split('  ')[0], 16)										# Obtain the end addr of the code cave in order to move on to the next one
-
-
 	code_cave_size = (counter + 1 ) * 4														# Calculate the code cave size using the counter
 	pykd.dprintln('[!] Code cave found at address {0} with a size of {1} bytes'.format(start_addr, code_cave_size))
 
-def vprot(addr) -> int:
+
+def vprot(addr):
 	out = pykd.dbgCommand('!vprot {0}'.format(addr))
 	out = out.split('Protect:           ')[1].split(' ')[0]			# Obtain the hex value of the protection value
 	try:
@@ -28,16 +28,16 @@ def vprot(addr) -> int:
 		pykd.dprintln(e)
 	
 	if out in prot_constants:										# If the memory region is executable -> return the address
-		return analyze_cave(addr)
-	return 0
+		analyze_cave(addr)
 
-def analyze(input) -> int:
+
+def analyze(input):
 	out_arr = input.split('\n')
 	for x in out_arr:
 		if '00000000 00000000 00000000 00000000' in x:				# Check if the region is empty
-			return vprot(x.split('  ')[0])							# If it is, move to vprot() in order to analyze it further		
-	return 0
+			vprot(x.split('  ')[0])							# If it is, move to vprot() in order to analyze it further		
 
+			
 def looper(start, end):												# This method is used in order to skip a code cave if one is found
 	global running_addr												# So that the script does not analyze the same cave multiple times
 	for address in range(start, end, 0xA):
