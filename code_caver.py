@@ -249,7 +249,7 @@ def main():
         sys.exit(0)
 
     pykd.dprintln(
-        f"[*] Scanning for code caves within address range: {hex(start)} - {hex(end)}\n"
+        f"[*] Scanning for code caves within address range: {hex(start)} - {hex(end)}"
     )
 
     scan_memory_range(start, end)
