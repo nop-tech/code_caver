@@ -57,7 +57,7 @@ def get_module_range(module_name: str) -> tuple:
                 if module_name in line:
                     parts = line.split()
                     start, end = int(parts[0], 16), int(parts[1], 16)
-                    pykd.dprintln(f"|-> From 0x{hex(start)} to 0x{hex(end)}")
+                    pykd.dprintln(f"|-> From {hex(start)} to {hex(end)}")
                     return start, end
         except (IndexError, ValueError):
             pykd.dprintln("[!] Failed to parse module address range.")
